@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
@@ -28,7 +28,7 @@ const TEST_WALLET = "0x3FD200a0C247e7Ddf7717e4F8dDAACe5d3C857F0"; // Common test
 
 // Hardcoded wallet balances
 const wallet = {
-  [TEST_WALLET]: {
+  [TEST_WALLET.toLowerCase()]: {
     [NATIVE_TOKEN_ADDRESS]: "14999999997", // ETH balance
     "0xdac17f958d2ee523a2206206994597c13d831ec6": "410981", // USDT balance
     "0x6b175474e89094c44da98b954eedeac495271d05": "999999975", // BTC balance
@@ -121,25 +121,19 @@ app.post("/", async (req, res) => {
         });
         break;
       case "eth_getBalance": {
-    const [address] = params;
-    const formattedAddress = address.toLowerCase();
+        const [address] = params;
+        const formattedAddress = address.toLowerCase();
 
-    // Ensure wallet and address exist in the storage
-    if (!wallet[formattedAddress] || !wallet[formattedAddress][NATIVE_TOKEN_ADDRESS]) {
-        res.json({ jsonrpc: "2.0", id, result: "0x0" }); // Return zero balance if not found
+        // Get the balance for the specified address and native token
+        const balance = wallet[formattedAddress]?.[NATIVE_TOKEN_ADDRESS] || "0";
+
+        // Convert the balance to Wei (assuming 18 decimals for ETH)
+        const balanceWei = BigInt(balance) * 10n ** 18n;
+
+        // Return the balance in hex format
+        res.json({ jsonrpc: "2.0", id, result: `0x${balanceWei.toString(16)}` });
         break;
-    }
-
-    // Get balance and convert to BigInt safely
-    const balance = BigInt(wallet[formattedAddress][NATIVE_TOKEN_ADDRESS] || "0");
-    
-    // Convert the balance to Wei (assuming 18 decimals for ETH)
-    const balanceWei = balance * 10n ** 18n;
-
-    // Return the balance in hex format
-    res.json({ jsonrpc: "2.0", id, result: `0x${balanceWei.toString(16)}` });
-    break;
-}
+      }
 
       case "eth_sendTransaction": {
         const [tx] = params;
