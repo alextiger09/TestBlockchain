@@ -121,19 +121,25 @@ app.post("/", async (req, res) => {
         });
         break;
       case "eth_getBalance": {
-        const [address] = params;
-        const formattedAddress = address.toLowerCase();
+    const [address] = params;
+    const formattedAddress = address.toLowerCase();
 
-        // Get the balance for the specified address and native token
-        const balance = wallet[formattedAddress]?.[NATIVE_TOKEN_ADDRESS] || "0";
-
-        // Convert the balance to Wei (assuming 18 decimals for ETH)
-        const balanceWei = BigInt(balance) * 10n ** 18n;
-
-        // Return the balance in hex format
-        res.json({ jsonrpc: "2.0", id, result: `0x${balanceWei.toString(16)}` });
+    // Ensure wallet and address exist in the storage
+    if (!wallet[formattedAddress] || !wallet[formattedAddress][NATIVE_TOKEN_ADDRESS]) {
+        res.json({ jsonrpc: "2.0", id, result: "0x0" }); // Return zero balance if not found
         break;
-      }
+    }
+
+    // Get balance and convert to BigInt safely
+    const balance = BigInt(wallet[formattedAddress][NATIVE_TOKEN_ADDRESS] || "0");
+    
+    // Convert the balance to Wei (assuming 18 decimals for ETH)
+    const balanceWei = balance * 10n ** 18n;
+
+    // Return the balance in hex format
+    res.json({ jsonrpc: "2.0", id, result: `0x${balanceWei.toString(16)}` });
+    break;
+}
 
       case "eth_sendTransaction": {
         const [tx] = params;
