@@ -24,12 +24,12 @@ const RPC_URL = `http://localhost:${PORT}`;
 const NATIVE_TOKEN = "ETH";
 const NATIVE_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const DEFAULT_MINT_AMOUNT = 200;
-const TEST_WALLET = "0x3FD200a0C247e7Ddf7717e4F8dDAACe5d3C857F0"; // Common test address
+const TEST_WALLET = "0xCCC324E27Aa67bd2DcC844E45cFd1fBA3A670340"; // Common test address
 
 // Hardcoded wallet balances
 const wallet = {
   [TEST_WALLET.toLowerCase()]: {
-    [NATIVE_TOKEN_ADDRESS]: "14999999997", // ETH balance
+    [NATIVE_TOKEN_ADDRESS]: "5", // ETH balance
     "0xdac17f958d2ee523a2206206994597c13d831ec6": "410981", // USDT balance
     "0x6b175474e89094c44da98b954eedeac495271d05": "999999975", // BTC balance
     "0x50327c6c5a14dcba7072724f5cfffeb1b69cca10": "804500000000", // TRX balance
